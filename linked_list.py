@@ -32,13 +32,20 @@ class LinkedList:
     def __len__(self):
         return self.size
 
-    def __getitem__(self, i):
+    def __getnode__(self, i):
+        if len(self) < i or i < 0:
+            raise IndexError
         node = self.head
         j = 0
         while j < i:
             node = node.next
             j += 1
-        return node.data
+        return node
+
+    def __getitem__(self, i):
+        if len(self) <= i or i < 0:
+            raise IndexError
+        return self.__getnode__(i).data
 
     def __repr__(self):
         res = "\n"
@@ -107,5 +114,34 @@ class LinkedList:
         self.tail = self.tail.prev
         if self.tail is None:
             self.head = None
+        self.size -= 1
+        return ret
+
+    def push_at(self, index, value):
+        node = self.__getnode__(index)
+        if node is None:
+            # push to end
+            self.push_back(value)
+            return
+        prev_node = node.prev
+        new_node = Node(prev=prev_node, next=node, data=value)
+        if prev_node is not None:
+            prev_node.next = new_node
+        else:
+            # new_node must be the new head
+            self.head = new_node
+        node.prev = new_node
+        self.size += 1
+
+    def pop_at(self, index):
+        node = self.__getnode__(index)
+        assert node is not None
+        if node == self.head:
+            return self.pop_front()
+        if node == self.tail:
+            return self.pop_back()
+        ret = node.data
+        node.prev.next = node.next
+        node.next.prev = node.prev
         self.size -= 1
         return ret

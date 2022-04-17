@@ -28,3 +28,8 @@ def test_linked_list_push_and_pop():
     assert x == 3
 
     assert len(my_list) == 0
+
+def test_repr_linked_list():
+    my_list = linked_list.LinkedList([1,3,4])
+    print(repr(my_list))
+    print(my_list.backward_repr())

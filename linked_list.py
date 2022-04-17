@@ -23,6 +23,12 @@ class LinkedList:
             yield node.data
             node = node.next
     
+    def __reversed__(self):
+        node = self.tail
+        while node is not None:
+            yield node.data
+            node = node.prev
+    
     def __len__(self):
         return self.size
 
@@ -33,6 +39,30 @@ class LinkedList:
             node = node.next
             j += 1
         return node.data
+
+    def __repr__(self):
+        res = "\n"
+        res += "repr:\n"
+        for value in self:
+            res += "_________\n"
+            res += "|       |\n"
+            res += "|   " + str(value) + "   |\n"
+            res += "|_______|\n"
+            res += "    |    \n"
+            res += "    v    \n"
+        return res
+
+    def backward_repr(self):
+        res = "\n"
+        res += "backward repr:\n"
+        for value in reversed(self):
+            res += "_________\n"
+            res += "|       |\n"
+            res += "|   " + str(value) + "   |\n"
+            res += "|_______|\n"
+            res += "    |    \n"
+            res += "    v    \n"
+        return res
 
     def add_multiple_nodes(self, values=[]):
         for value in values:

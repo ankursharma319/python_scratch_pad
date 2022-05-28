@@ -79,7 +79,7 @@ def test_linked_list_sort():
     assert my_list[2] == 3
 
 def test_linked_list_sort_huge():
-    size = 1000000
+    size = 100000
     my_list = linked_list.LinkedList([i for i in range(size)])
     assert len(my_list) == size
     assert my_list[0] == 0

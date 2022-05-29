@@ -2,7 +2,7 @@ import math
 import copy
 
 class Node:
-    def __init__(self, keys=[], values=[], children=[], parent=None, max_capacity=1) -> None:
+    def __init__(self, keys=[], values=[], children=[], parent=None, max_capacity=2) -> None:
         self.keys = keys
         self.values = values
         self.children = children
@@ -15,8 +15,9 @@ class Node:
         assert len(self.keys) <= self.max_capacity
         if len(self.children) != 0:
             assert len(self.children) == len(self.keys) + 1
-        if self.parent is not None:
-            assert len(self.keys) >= math.ceil(self.max_capacity/2)
+            assert len(self.children) >= 2
+        if self.parent is not None and self.children:
+            assert len(self.keys) >= self.max_capacity//2
         for child in self.children:
             assert child is not None
         prev_key = self.keys[0]
@@ -57,10 +58,10 @@ class Node:
         return self
 
     def to_string(self):
-        self.verify_constraints()
         res = ""
         for key in self.keys:
-            res += f"{key}, "
+            res += f"{key} "
+        res = res[:-1]
         res = f"[{res}]"
         return res
     
@@ -76,7 +77,7 @@ class Node:
         return result
 
 class BTree:
-    def __init__(self, order=2):
+    def __init__(self, order=3):
         assert order > 1
         self.order = order
         self.root = None
@@ -88,29 +89,31 @@ class BTree:
 
     def insert(self, key, value):
         if self.root is None:
-            print(f"Creating a root node of key {key}")
+            #print(f"Creating a root node of key {key}")
             self.root = Node([key], [value], max_capacity=self.order-1)
             self.element_count = 1
             self.node_count = 1
             return self.root
         current_node = self.root
         i = 0
+        #print(f"----------------------------------------------")
+        #print(f"insert called with key {key}")
         while True:
-            print(f"Iteration #{i} of while loop in insert to find correct insert position")
+            #print(f"Iteration #{i} of while loop in insert to find correct insert position")
             i+=1
-            print(f"current_node = {current_node.to_string()}")
+            #print(f"current_node = {current_node.to_string()}")
             if not current_node.children and current_node.space_left():
-                print(f"Doing a simple insert of key {key} in to the node {current_node.to_string()}")
+                #print(f"Doing a simple insert of key {key} in to the node {current_node.to_string()}")
                 self.element_count += 1
                 return current_node.simple_insert(key, value)
             if not current_node.children and not current_node.space_left():
-                print(f"Need to do a split insert of key {key} in to node {current_node.to_string()}")
+                #print(f"Need to do a split insert of key {key} in to node {current_node.to_string()}")
                 self.element_count += 1
                 return self._split_insert(current_node, key, value)
-            print(f"Trying to move down to a leaf node so that we can insert key {key}")
+            #print(f"Trying to move down to a leaf node so that we can insert key {key}")
             assert len(current_node.children) > 0
             if key > current_node.keys[-1]:
-                print("Moving to right most child")
+                #print("Moving to right most child")
                 current_node.verify_constraints()
                 current_node = current_node.children[-1]
                 continue
@@ -119,7 +122,7 @@ class BTree:
                 assert key_left != key
                 if key < key_left:
                     current_node = current_node.children[i]
-                    print(f"Moving to child at {i}th position")
+                    #print(f"Moving to child at {i}th position")
                     break
         raise RuntimeError("Unreachable code")
     
@@ -127,6 +130,25 @@ class BTree:
         if not self.root:
             return None
         return self.root.dfs_visit_in_order()
+
+    def to_string(self):
+        if self.root is None:
+            return ""
+        result = ""
+        queue = [self.root]
+        level = 0
+        while len(queue) > 0:
+            level_size = len(queue)
+            while level_size != 0:
+                node = queue.pop(0)
+                result += node.to_string()
+                result += " "
+                queue.extend(node.children)
+                level_size -= 1
+            result = result[:-1]
+            result += "\n"
+            level += 1
+        return result
 
     def bfs_visit(self):
         if self.root is None:
@@ -140,7 +162,7 @@ class BTree:
         return visited
 
     def _split_insert(self, node, key, value, new_right_child=None):
-        print(f"Doing a split insert of key {key} in to the node {node.to_string()}")
+        #print(f"Doing a split insert of key {key} in to the node {node.to_string()}")
         self.node_count += 1
         keys_to_split = []
         values_to_split = []
@@ -180,30 +202,33 @@ class BTree:
             assert len(right_children) == len(right_keys) + 1
             assert len(children_to_split) == self.order + 1
 
+        #print(f"insertion_index = {insertion_index}")
+        #print(f"keys_to_split = {keys_to_split}")
+        #print(f"children_to_split size = {len(children_to_split)}")
+        #print(f"left_keys = {left_keys}, middle_key = {middle_key}, right_keys = {right_keys}")
+        #print(f"left_children size = {len(left_children)}, right_children size = {len(right_children)}")
+
         assert len(left_keys) - len(right_keys) <= 1
         assert middle_key not in left_keys
         assert middle_key not in right_keys
         assert len(left_keys) + len(right_keys) + 1 == len(keys_to_split)
         assert len(keys_to_split) == self.order
         assert len(values_to_split) == len(keys_to_split)
+        assert len(right_keys) > 0
+ 
 
         right_node = Node(
             keys=right_keys, values=right_values,
             children=right_children, parent=node.parent,
             max_capacity=self.order-1
         )
+        #print(f"Created a new right_node = {right_node.to_string()}")
         node.keys = left_keys
         node.values = left_values
         node.children = left_children
 
-        print(f"insertion_index = {insertion_index}")
-        print(f"keys_to_split = {keys_to_split}")
-        print(f"children_to_split = {children_to_split}")
-        print(f"left_keys = {left_keys}, middle_key = {middle_key}, right_keys = {right_keys}")
-        print(f"left_children = {left_children}, right_children = {right_children}")
-        print(f"Created a new right_node = {right_node.to_string()}")
         if node.parent is None:
-            print(f"Creating a new root node with key {middle_key}")
+            #print(f"Creating a new root node with key {middle_key}")
             self.root = Node(
                 keys=[middle_key], values=[middle_value],
                 children=[node, right_node], parent=None,
@@ -212,10 +237,21 @@ class BTree:
             right_node.parent = self.root
             node.parent = self.root
             self.node_count += 1
-            return self.root
         elif node.parent.space_left():
-            print(f"Doing a simple insert of key {middle_key} in to the node {node.parent.to_string()}")
-            return node.parent.simple_insert(key=middle_key, value=middle_value, right_child=right_node)
+            #print(f"Doing a simple insert of key {middle_key} in to the node {node.parent.to_string()}")
+            node.parent.simple_insert(key=middle_key, value=middle_value, right_child=right_node)
         else:
-            print(f"Recursively split insert into parent node {node.parent.to_string()}")
-            return self._split_insert(node=node.parent, key=middle_key, value=middle_value, new_right_child=right_node)
+            #print(f"Recursively split insert key {middle_key} into parent node {node.parent.to_string()}")
+            new_parent = self._split_insert(node=node.parent, key=middle_key, value=middle_value, new_right_child=right_node)
+            #print(f"new_parent for key {middle_key} is {new_parent.to_string()}")
+            assert node in new_parent.children
+            assert right_node in new_parent.children
+            right_node.parent = new_parent
+            node.parent = new_parent
+        if middle_key == key:
+            return node.parent
+        if key < middle_key:
+            return node
+        else:
+            assert key > middle_key
+            return right_node

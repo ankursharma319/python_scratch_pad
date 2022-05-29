@@ -120,8 +120,15 @@ class BTree:
         return self.root.dfs_visit_in_order()
 
     def bfs_visit(self):
-        res = []
-        return res
+        if self.root is None:
+            return []
+        visited = []
+        queue = [self.root]
+        while len(queue) > 0:
+            node = queue.pop(0)
+            visited.extend(node.keys)
+            queue.extend(node.children)
+        return visited
 
     def _split_insert(self, node, key, value, new_right_child=None):
         print(f"Doing a split insert of key {key} in to the node {node.to_string()}")

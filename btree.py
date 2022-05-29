@@ -80,11 +80,18 @@ class BTree:
         assert order > 1
         self.order = order
         self.root = None
+        self.element_count = 0
+        self.node_count = 0
+
+    def size(self):
+        return self.element_count
 
     def insert(self, key, value):
         if self.root is None:
             print(f"Creating a root node of key {key}")
             self.root = Node([key], [value], max_capacity=self.order-1)
+            self.element_count = 1
+            self.node_count = 1
             return self.root
         current_node = self.root
         i = 0
@@ -94,9 +101,11 @@ class BTree:
             print(f"current_node = {current_node.to_string()}")
             if not current_node.children and current_node.space_left():
                 print(f"Doing a simple insert of key {key} in to the node {current_node.to_string()}")
+                self.element_count += 1
                 return current_node.simple_insert(key, value)
             if not current_node.children and not current_node.space_left():
                 print(f"Need to do a split insert of key {key} in to node {current_node.to_string()}")
+                self.element_count += 1
                 return self._split_insert(current_node, key, value)
             print(f"Trying to move down to a leaf node so that we can insert key {key}")
             assert len(current_node.children) > 0
@@ -132,6 +141,7 @@ class BTree:
 
     def _split_insert(self, node, key, value, new_right_child=None):
         print(f"Doing a split insert of key {key} in to the node {node.to_string()}")
+        self.node_count += 1
         keys_to_split = []
         values_to_split = []
         children_to_split = []
@@ -201,6 +211,7 @@ class BTree:
             )
             right_node.parent = self.root
             node.parent = self.root
+            self.node_count += 1
             return self.root
         elif node.parent.space_left():
             print(f"Doing a simple insert of key {middle_key} in to the node {node.parent.to_string()}")

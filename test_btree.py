@@ -36,3 +36,18 @@ def test_btree_bfs_visit():
 	tree.insert(50, 34)
 	tree.insert(35, 2.345)
 	assert [20, 40, 10, 30, 35, 50] == tree.bfs_visit()
+
+def test_btree_size():
+	tree = btree.BTree(order=3)
+	assert tree.size() == 0
+	assert tree.node_count == 0
+	tree.insert(10, 0)
+	tree.insert(20, 0)
+	assert tree.size() == 2
+	assert tree.node_count == 1
+	tree.insert(30, 0)
+	tree.insert(40, True)
+	tree.insert(50, 0)
+	tree.insert(35, 0)
+	assert tree.size() == 6
+	assert tree.node_count == 4

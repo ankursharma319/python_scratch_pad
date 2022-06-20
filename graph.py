@@ -40,3 +40,26 @@ def bfs_visit(adj_list, starting_vertex):
         frontier_queue = new_frontier
 
     return (visited_nodes, parents, levels)
+
+def dfs_visit_recursive(adj_list, starting_vertex, parents, visited_nodes):
+    for dest in adj_list[starting_vertex]:
+        if dest not in parents:
+            visited_nodes.append(dest)
+            parents[dest] = starting_vertex
+            visited_nodes, parents = dfs_visit_recursive(
+                adj_list=adj_list,
+                starting_vertex=dest,
+                parents=parents,
+                visited_nodes=visited_nodes
+            )
+    return visited_nodes, parents
+
+def dfs_visit(adj_list, starting_vertex):
+    parents = {starting_vertex : None}
+    visited_nodes = [starting_vertex]
+    return dfs_visit_recursive(
+        adj_list=adj_list,
+        starting_vertex=starting_vertex,
+        parents = parents,
+        visited_nodes= visited_nodes
+    )

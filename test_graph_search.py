@@ -66,3 +66,44 @@ def test_depth_first_visit_example_1():
     }, starting_vertex=1)
     assert visited_nodes == [1,2,3,4]
     assert parent_dict == {1:None, 2: 1, 3: 1, 4: 3}
+
+def test_depth_first_visit_example_2():
+    visited_nodes, parent_dict = graph.dfs_visit(adj_list={
+        1 : [2, 3],
+        2 : [8],
+        3 : [1,4],
+        4 : [9],
+        5 : [6, 7],
+        6 : [5],
+        7:  [1],
+        8:  [9],
+        9: []
+    }, starting_vertex=1)
+    assert visited_nodes == [1,2,8,9,3,4]
+    assert parent_dict == {1:None, 2: 1, 3: 1, 8: 2, 4: 3, 9:8}
+
+def test_depth_first_visit_iterative_example_1():
+    visited_nodes, parent_dict = graph.dfs_visit_iterative(adj_list={
+        1 : [2, 3],
+        2 : [],
+        3 : [1,4],
+        4 : [],
+        5 : []
+    }, starting_vertex=1)
+    assert visited_nodes == [1,2,3,4]
+    assert parent_dict == {1:None, 2: 1, 3: 1, 4: 3}
+
+def test_depth_first_visit_iterative_example_2():
+    visited_nodes, parent_dict = graph.dfs_visit_iterative(adj_list={
+        1 : [2, 3],
+        2 : [8],
+        3 : [1,4],
+        4 : [9],
+        5 : [6, 7],
+        6 : [5],
+        7:  [1],
+        8:  [9],
+        9: []
+    }, starting_vertex=1)
+    assert visited_nodes == [1,2,8,9,3,4]
+    assert parent_dict == {1:None, 2: 1, 3: 1, 8: 2, 4: 3, 9:8}

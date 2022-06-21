@@ -44,6 +44,8 @@ def bfs_visit(adj_list, starting_vertex):
 def dfs_visit_recursive(adj_list, starting_vertex, parents, visited_nodes):
     for dest in adj_list[starting_vertex]:
         if dest not in parents:
+            # if move this append after the recursive call
+            # then it will be deepest elements first (in the list)
             visited_nodes.append(dest)
             parents[dest] = starting_vertex
             visited_nodes, parents = dfs_visit_recursive(
@@ -52,6 +54,19 @@ def dfs_visit_recursive(adj_list, starting_vertex, parents, visited_nodes):
                 parents=parents,
                 visited_nodes=visited_nodes
             )
+    return visited_nodes, parents
+
+def dfs_visit_iterative(adj_list, starting_vertex):
+    parents = {starting_vertex: None}
+    visited_nodes = []
+    stack = [starting_vertex]
+    while len(stack) > 0:
+        v = stack.pop()
+        for dest in reversed(adj_list[v]):
+            if dest not in parents:
+                parents[dest] = v
+                stack.append(dest)
+        visited_nodes.append(v)
     return visited_nodes, parents
 
 def dfs_visit(adj_list, starting_vertex):

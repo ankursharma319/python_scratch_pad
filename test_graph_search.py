@@ -108,18 +108,50 @@ def test_depth_first_visit_iterative_example_2():
     assert visited_nodes == [1,2,8,9,3,4]
     assert parent_dict == {1:None, 2: 1, 3: 1, 8: 2, 4: 3, 9:8}
 
-def test_edge_classify_exammple_1():
+def test_edge_classify_example_1():
     classifications = graph.edge_classify(adj_list={
         1 : [2, 3, 4],
         2 : [],
         3 : [1 ,4],
         4 : [],
         5 : [4]
-    }, starting_vertex=1)
+    })
     assert classifications == {
         1 : {2:"tree", 3:"tree", 4: "forward"},
         2 : {},
         3 : {1:"back", 4:"tree"},
         4 : {},
         5 : {4:"cross"}
+    }
+
+def test_edge_classify_example_2():
+    classifications = graph.edge_classify_single_source(adj_list={
+        'a' : ['b', 'f'],
+        'b' : ['c'],
+        'c' : ['e', 'd'],
+        'd' : ['e', 'b'],
+        'e' : [],
+        'f' : ['g'],
+        'g' : ['l', 'h', 'm'],
+        'h' : ['i', 'k', 'f'],
+        'i' : ['d', 'j'],
+        'j' : [],
+        'k' : ['l', 'm'],
+        'l' : [],
+        'm' : ['i', 'h'],
+    }, starting_vertex='a')
+    assert classifications == {
+        'a' : {'b':"tree", 'f':"tree"},
+        'b' : {'c':"tree"},
+        'c' : {'e':"tree", 'd':"tree"},
+        'd' : {'e':"cross", 'b':"back"},
+        'e' : {},
+        'f' : {'g':"tree"},
+        'g' : {'l':"tree", 'h':"tree", 'm':"forward"},
+        'h' : {'i':"tree", 'k':"tree", 'f':"back"},
+        'i' : {'d':"cross", 'j':"tree"},
+        'j' : {},
+        'k' : {'l':"cross", 'm':"tree"},
+        'l' : {},
+        'm' : {'i':"cross", 'h':"back"},
     }

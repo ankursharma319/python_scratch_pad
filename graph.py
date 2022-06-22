@@ -110,18 +110,23 @@ def edge_classifying_recursive_dfs(
         else:
             assert dest in starting_times
             if starting_times[starting_vertex] < starting_times[dest]:
+                assert dest in ending_times, f"should have already finished visiting dest completely but it is still in stack"
                 classes[starting_vertex][dest] = "forward"
-            elif starting_times[starting_vertex] > starting_times[dest]:
+            elif starting_times[starting_vertex] > starting_times[dest] and dest not in ending_times:
                 classes[starting_vertex][dest] = "back"
-            else:
+            elif starting_times[starting_vertex] > starting_times[dest] and dest in ending_times:
                 classes[starting_vertex][dest] = "cross"
+            else:
+                assert False, f"internal logical error"
 
         current_time_step += 1
     current_time_step += 1
-    ending_times[current_time_step] = current_time_step
+    ending_times[starting_vertex] = current_time_step
     return parents, visited_nodes, classes, starting_times, ending_times, current_time_step
 
-def edge_classify(adj_list, starting_vertex):
+def edge_classify_single_source(adj_list, starting_vertex):
+    # inspiration from https://www.youtube.com/watch?v=wm6qRWGjvkA
+    # and from https://www.geeksforgeeks.org/tree-back-edge-and-cross-edges-in-dfs-of-graph/
     classes = {}
     parents = {starting_vertex : None}
     visited_nodes = []
@@ -142,4 +147,26 @@ def edge_classify(adj_list, starting_vertex):
     )
     return classes
 
- 
+def edge_classify(adj_list):
+    classes = {}
+    parents = {}
+    visited_nodes = []
+    starting_times = {}
+    ending_times = {}
+    current_time_step = 0
+    for v in adj_list:
+        classes[v] = {}
+    for starting_vertex in adj_list:
+        if starting_vertex not in parents:
+            parents[starting_vertex] = None
+            parents, visited_nodes, classes, starting_times, ending_times, current_time_step = edge_classifying_recursive_dfs(
+                adj_list=adj_list,
+                starting_vertex=starting_vertex,
+                parents=parents,
+                visited_nodes=visited_nodes,
+                classes=classes,
+                starting_times=starting_times,
+                ending_times=ending_times,
+                current_time_step=current_time_step
+            )
+    return classes

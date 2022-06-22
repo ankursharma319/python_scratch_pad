@@ -107,3 +107,19 @@ def test_depth_first_visit_iterative_example_2():
     }, starting_vertex=1)
     assert visited_nodes == [1,2,8,9,3,4]
     assert parent_dict == {1:None, 2: 1, 3: 1, 8: 2, 4: 3, 9:8}
+
+def test_edge_classify_exammple_1():
+    classifications = graph.edge_classify(adj_list={
+        1 : [2, 3, 4],
+        2 : [],
+        3 : [1 ,4],
+        4 : [],
+        5 : [4]
+    }, starting_vertex=1)
+    assert classifications == {
+        1 : {2:"tree", 3:"tree", 4: "forward"},
+        2 : {},
+        3 : {1:"back", 4:"tree"},
+        4 : {},
+        5 : {4:"cross"}
+    }

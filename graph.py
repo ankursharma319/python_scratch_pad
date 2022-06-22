@@ -78,3 +78,68 @@ def dfs_visit(adj_list, starting_vertex):
         parents = parents,
         visited_nodes= visited_nodes
     )
+
+def edge_classifying_recursive_dfs(
+    adj_list, starting_vertex, 
+    parents, visited_nodes, classes,
+    starting_times, ending_times,
+    current_time_step
+):
+    current_time_step += 1
+    visited_nodes.append(starting_vertex)
+    starting_times[starting_vertex] = current_time_step
+    # run dfs recursively (but with more metadata recording)
+    for dest in adj_list[starting_vertex]:
+        if dest not in parents:
+            # if move this append after the recursive call
+            # then it will be deepest elements first (in the list)
+            parents[dest] = starting_vertex
+            classes[starting_vertex][dest] = "tree"
+            ( parents, visited_nodes, classes
+            , starting_times, ending_times, current_time_step
+            ) = edge_classifying_recursive_dfs(
+                adj_list=adj_list,
+                starting_vertex=dest,
+                parents=parents,
+                visited_nodes=visited_nodes,
+                classes=classes,
+                starting_times=starting_times,
+                ending_times=ending_times,
+                current_time_step=current_time_step
+            )
+        else:
+            assert dest in starting_times
+            if starting_times[starting_vertex] < starting_times[dest]:
+                classes[starting_vertex][dest] = "forward"
+            elif starting_times[starting_vertex] > starting_times[dest]:
+                classes[starting_vertex][dest] = "back"
+            else:
+                classes[starting_vertex][dest] = "cross"
+
+        current_time_step += 1
+    current_time_step += 1
+    ending_times[current_time_step] = current_time_step
+    return parents, visited_nodes, classes, starting_times, ending_times, current_time_step
+
+def edge_classify(adj_list, starting_vertex):
+    classes = {}
+    parents = {starting_vertex : None}
+    visited_nodes = []
+    starting_times = {}
+    ending_times = {}
+    current_time_step = 0
+    for v in adj_list:
+        classes[v] = {}
+    parents, visited_nodes, classes, starting_times, ending_times, current_time_step = edge_classifying_recursive_dfs(
+        adj_list=adj_list,
+        starting_vertex=starting_vertex,
+        parents=parents,
+        visited_nodes=visited_nodes,
+        classes=classes,
+        starting_times=starting_times,
+        ending_times=ending_times,
+        current_time_step=current_time_step
+    )
+    return classes
+
+ 

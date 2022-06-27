@@ -1,7 +1,6 @@
 
 from math import inf
-from tracemalloc import start
-
+import random
 
 def separate_sets_to_adjacency_list(vertices, edges):
     if isinstance(vertices, dict):
@@ -170,3 +169,24 @@ def edge_classify(adj_list):
                 current_time_step=current_time_step
             )
     return classes
+
+def dfs_visit_for_top_sort(adj_list, result, unvisited_set, starting_node):
+    print(f"dfs_visiting {starting_node}")
+    if starting_node in unvisited_set:
+        unvisited_set.remove(starting_node)
+    for dest in adj_list[starting_node]:
+        if dest in unvisited_set:
+            result, unvisited_set = dfs_visit_for_top_sort(
+                adj_list=adj_list, result=result, unvisited_set=unvisited_set, starting_node=dest
+            )
+    print(f"finished visiting {starting_node}")
+    result.append(starting_node)
+    return result, unvisited_set
+
+def top_sort(adj_list):
+    result = []
+    unvisited_set = set(adj_list.keys())
+    while len(unvisited_set) > 0:
+        unvisited_node = unvisited_set.pop()
+        result, unvisited_set = dfs_visit_for_top_sort(adj_list=adj_list, result=result, unvisited_set=unvisited_set, starting_node=unvisited_node)
+    return list(reversed(result))

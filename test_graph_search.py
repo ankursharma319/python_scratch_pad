@@ -155,3 +155,33 @@ def test_edge_classify_example_2():
         'l' : {},
         'm' : {'i':"cross", 'h':"back"},
     }
+
+def test_top_sort():
+    adj_list = {
+        'a' : ['b', 'f'],
+        'b' : ['c'],
+        'c' : ['e', 'd'],
+        'd' : ['e', 'b'],
+        'e' : [],
+        'f' : ['g'],
+        'g' : ['l', 'h', 'm'],
+        'h' : ['i', 'k', 'f'],
+        'i' : ['d', 'j'],
+        'j' : [],
+        'k' : ['l', 'm'],
+        'l' : [],
+        'm' : ['i', 'h'],
+    }
+    result = graph.top_sort(adj_list=adj_list)
+    assert isinstance(result, list)
+    assert len(result) == len(adj_list)
+    print(f"result = {result}")
+    checked = []
+    for x in result:
+        print(f"verifying that {x} has its dependencies already visited")
+        for possible_source in adj_list:
+            if x in adj_list[possible_source]:
+                print(f"making sure node {x} has its dependency {possible_source} already visited ({checked})")
+                assert possible_source in checked
+        print(f"verified that {x} has its dependencies already visited")
+        checked.append(x)

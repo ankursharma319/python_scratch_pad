@@ -46,6 +46,7 @@ def test_btree_tostring():
 	assert tree.to_string() == """[20 40]
 [10] [30 35] [50]
 """
+
 def test_btree_large():
 	tree_order = 32
 	tree = btree.BTree(order=tree_order)

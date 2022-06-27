@@ -171,7 +171,6 @@ def edge_classify(adj_list):
     return classes
 
 def dfs_visit_for_top_sort(adj_list, result, unvisited_set, starting_node):
-    print(f"dfs_visiting {starting_node}")
     if starting_node in unvisited_set:
         unvisited_set.remove(starting_node)
     for dest in adj_list[starting_node]:
@@ -179,7 +178,6 @@ def dfs_visit_for_top_sort(adj_list, result, unvisited_set, starting_node):
             result, unvisited_set = dfs_visit_for_top_sort(
                 adj_list=adj_list, result=result, unvisited_set=unvisited_set, starting_node=dest
             )
-    print(f"finished visiting {starting_node}")
     result.append(starting_node)
     return result, unvisited_set
 

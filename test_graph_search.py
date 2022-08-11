@@ -181,3 +181,37 @@ def test_top_sort():
             if x in adj_list[possible_source]:
                 assert possible_source in checked
         checked.append(x)
+
+def test_dag_shortest_path_via_relaxation():
+    adj_list = {
+        1: [(2,5), (3,3)],
+        2: [(3,2), (4,6)],
+        3: [(4,7), (5,4), (6,2)],
+        4: [(5,-1), (6,1)],
+        5: [(6,-2)],
+        6: [],
+    }
+    deltas, pis = graph.dag_shortest_path(
+        adj_list=adj_list,
+        starting_vertex=2
+    )
+
+    expected_deltas = {
+        1: inf,
+        2: 0,
+        3: 2,
+        4: 6,
+        5: 5,
+        6: 3,
+    }
+    assert deltas == expected_deltas
+
+    expected_pis = {
+        1: None,
+        2: None,
+        3: 2,
+        4: 2,
+        5: 4,
+        6: 5,
+    }
+    assert pis == expected_pis

@@ -54,7 +54,7 @@ def test_btree_large():
 	for i in range(large_n):
 		tree.insert(i, i)
 		assert tree.size() == i+1
-	print(f"printing final tree =\n{tree.to_string()}")
+	#print(f"printing final tree =\n{tree.to_string()}")
 	assert [i for i in range(large_n)] == tree.dfs_visit_in_order()
 	assert tree.node_count > tree.size() / tree_order
 	assert tree.node_count < tree.size()

@@ -171,9 +171,13 @@ def edge_classify(adj_list):
     return classes
 
 def dfs_visit_for_top_sort(adj_list, result, unvisited_set, starting_node):
+    if isinstance(starting_node, tuple):
+        starting_node = starting_node[0]
     if starting_node in unvisited_set:
         unvisited_set.remove(starting_node)
     for dest in adj_list[starting_node]:
+        if isinstance(dest, tuple):
+            dest = dest[0]
         if dest in unvisited_set:
             result, unvisited_set = dfs_visit_for_top_sort(
                 adj_list=adj_list, result=result, unvisited_set=unvisited_set, starting_node=dest
@@ -188,3 +192,20 @@ def top_sort(adj_list):
         unvisited_node = unvisited_set.pop()
         result, unvisited_set = dfs_visit_for_top_sort(adj_list=adj_list, result=result, unvisited_set=unvisited_set, starting_node=unvisited_node)
     return list(reversed(result))
+
+def dag_shortest_path(adj_list, starting_vertex):
+    deltas = {}
+    pis = {}
+    for vertex in adj_list:
+        deltas[vertex] = inf
+        pis[vertex] = None
+    top_sorted_vertices = top_sort(adj_list=adj_list)
+    index_of_starting_vertex = top_sorted_vertices.index(starting_vertex)
+    top_sorted_vertices = top_sorted_vertices[index_of_starting_vertex:]
+    deltas[starting_vertex] = 0
+    for vertex in top_sorted_vertices:
+        for (dest, weight) in adj_list[vertex]:
+            if deltas[dest] > deltas[vertex] + weight:
+                deltas[dest] = deltas[vertex] + weight
+                pis[dest] = vertex
+    return deltas, pis

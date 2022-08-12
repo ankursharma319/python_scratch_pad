@@ -238,3 +238,25 @@ def dijkstras_shortest_path(adj_list: dict, starting_vertex):
                 deltas[dest] = deltas[current_vertex] + weight
                 pis[dest] = current_vertex
     return deltas, pis
+
+def bellman_ford_shortest_path(adj_list: dict, starting_vertex):
+    deltas = {}
+    pis = {}
+    for vertex in adj_list:
+        deltas[vertex] = inf
+        pis[vertex] = None
+    deltas[starting_vertex] = 0
+    for i in range(len(adj_list)):
+        # for all edges, do relaxation
+        for vertex in adj_list:
+            for (dest, weight) in adj_list[vertex]:
+                if deltas[dest] > deltas[vertex] + weight:
+                    deltas[dest] = deltas[vertex] + weight
+                    pis[dest] = vertex
+    # check that we are done (that there was no negative cycles)
+    for vertex in adj_list:
+        for (dest, weight) in adj_list[vertex]:
+            if deltas[dest] > deltas[vertex] + weight:
+                print("There was negative cycles")
+                return None
+    return deltas, pis

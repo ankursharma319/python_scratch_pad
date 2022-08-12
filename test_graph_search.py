@@ -250,3 +250,53 @@ def test_dijkstras_shortest_path():
         5: 3,
     }
     assert pis == expected_pis
+
+def test_bellman_ford_shortest_path_v1():
+    # contains positive cycles
+    adj_list = {
+        0: [(1,5)],
+        1: [(2,10), (3,3)],
+        2: [(3,1), (4,2)],
+        3: [(2,4), (4,8), (5,2)],
+        4: [(5,7)],
+        5: [(4,9)],
+    }
+    deltas, pis = graph.bellman_ford_shortest_path(
+        adj_list=adj_list,
+        starting_vertex=1
+    )
+    expected_deltas = {
+        0: inf,
+        1: 0,
+        2: 7,
+        3: 3,
+        4: 9,
+        5: 5,
+    }
+    assert deltas == expected_deltas
+
+    expected_pis = {
+        0: None,
+        1: None,
+        2: 3,
+        3: 1,
+        4: 2,
+        5: 3,
+    }
+    assert pis == expected_pis
+
+def test_bellman_ford_shortest_path_v2():
+    # contains negative cycles
+    adj_list = {
+        0: [(1,5)],
+        1: [(2,10), (3,3)],
+        2: [(3,1), (4,2)],
+        3: [(2,4), (4,8), (5,2)],
+        4: [(5,7)],
+        5: [(4,-9)],
+    }
+    returned = graph.bellman_ford_shortest_path(
+        adj_list=adj_list,
+        starting_vertex=1
+    )
+    assert returned is None

@@ -209,3 +209,32 @@ def dag_shortest_path(adj_list, starting_vertex):
                 deltas[dest] = deltas[vertex] + weight
                 pis[dest] = vertex
     return deltas, pis
+
+def _pop_min_from_list_based_on_deltas(vertices: list, deltas: dict):
+    assert len(vertices) > 0
+    assert len(deltas) > 0
+    current_min_vertex = vertices[0]
+    current_min_delta = deltas[current_min_vertex]
+    for vertex in vertices:
+        if deltas[vertex] < current_min_delta:
+            current_min_delta = deltas[vertex]
+            current_min_vertex = vertex
+    vertices.remove(current_min_vertex)
+    return current_min_vertex
+
+def dijkstras_shortest_path(adj_list: dict, starting_vertex):
+    deltas = {}
+    pis = {}
+    for vertex in adj_list:
+        deltas[vertex] = inf
+        pis[vertex] = None
+    deltas[starting_vertex] = 0
+    remaining_vertices = list(adj_list.keys())
+    while len(remaining_vertices) > 0:
+        current_vertex = _pop_min_from_list_based_on_deltas(remaining_vertices, deltas)
+        for (dest, weight) in adj_list[current_vertex]:
+            # relaxation
+            if deltas[dest] > deltas[current_vertex] + weight:
+                deltas[dest] = deltas[current_vertex] + weight
+                pis[dest] = current_vertex
+    return deltas, pis

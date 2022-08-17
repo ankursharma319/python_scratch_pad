@@ -300,3 +300,37 @@ def test_bellman_ford_shortest_path_v2():
         starting_vertex=1
     )
     assert returned is None
+
+def test_dynamic_programming_perspective_shortest_path():
+    adj_list = {
+        1: [(2,5), (3,3)],
+        2: [(3,2), (4,6)],
+        3: [(4,7), (5,4), (6,2)],
+        4: [(5,-1), (6,1)],
+        5: [(6,-2)],
+        6: [],
+    }
+    deltas, pis = graph.dp_shortest_path(
+        adj_list=adj_list,
+        starting_vertex=2
+    )
+
+    expected_deltas = {
+        1: inf,
+        2: 0,
+        3: 2,
+        4: 6,
+        5: 5,
+        6: 3,
+    }
+    assert deltas == expected_deltas
+
+    expected_pis = {
+        1: None,
+        2: None,
+        3: 2,
+        4: 2,
+        5: 4,
+        6: 5,
+    }
+    assert pis == expected_pis

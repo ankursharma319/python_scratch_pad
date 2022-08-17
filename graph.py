@@ -260,3 +260,43 @@ def bellman_ford_shortest_path(adj_list: dict, starting_vertex):
                 print("There was negative cycles")
                 return None
     return deltas, pis
+
+def _reverse_adj_list(adj_list: dict) -> dict:
+    res = {}
+    for u in adj_list:
+        res[u] = []
+    for u in adj_list:
+        for v, weight in adj_list[u]:
+            res[v].append((u, weight))
+    return res
+
+def _get_delta_pi(v, reversed_adj_list, deltas_memo, pis_memo):
+    if v in deltas_memo:
+        assert v in pis_memo
+        return deltas_memo[v], pis_memo[v]
+    current_minimal_delta_v = inf
+    current_minimal_pi_v = None
+    for u, weight in reversed_adj_list[v]:
+        delta_u, pi_u = _get_delta_pi(u, reversed_adj_list=reversed_adj_list, deltas_memo=deltas_memo, pis_memo=pis_memo)
+        assert v not in deltas_memo, f"is there a cycle in the graph?"
+        if current_minimal_delta_v > delta_u + weight:
+            current_minimal_delta_v = delta_u + weight
+            current_minimal_pi_v = u
+    assert v not in deltas_memo, f"is there a cycle in the graph?"
+    deltas_memo[v] = current_minimal_delta_v
+    pis_memo[v] = current_minimal_pi_v
+    return current_minimal_delta_v, current_minimal_pi_v
+
+def dp_shortest_path(adj_list: dict, starting_vertex):
+    """
+    does not work for graphs with cycles because actually
+    in a way, recursion actually does a topological sort
+    """
+    deltas_memo = {}
+    pis_memo = {}
+    deltas_memo[starting_vertex] = 0
+    pis_memo[starting_vertex] = None
+    reversed_adj_list = _reverse_adj_list(adj_list)
+    for v in adj_list:
+        _get_delta_pi(v, reversed_adj_list=reversed_adj_list, deltas_memo=deltas_memo, pis_memo=pis_memo)
+    return deltas_memo, pis_memo

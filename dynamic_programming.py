@@ -220,3 +220,79 @@ def string_edit_distance(a: str, b: str) -> list [CharOperation]:
     cost_memo = {}
     seq, _ = _suffix_edit_distance(i=0, j=0, a=a, b=b, seq_memo=seq_memo, cost_memo=cost_memo)
     return seq
+
+def _knapsack_suffix_recurrence(i:int, purse:int, items:list, values, costs, max_purse, total_value_memo, total_cost_memo, item_set_memo):
+    if (i, purse) in total_value_memo:
+        assert (i, purse) in total_cost_memo
+        assert (i, purse) in item_set_memo
+        return total_value_memo[(i, purse)], total_cost_memo[(i, purse)], item_set_memo[(i, purse)]
+    if i >= len(items):
+        return 0, 0, set()
+    # with current item
+    suffix_purse_1 = purse - costs[items[i]]
+    suffix_value_1, suffix_cost_1, suffix_item_set_1 = _knapsack_suffix_recurrence(
+        i=i+1, purse=suffix_purse_1, items=items, values=values,
+        costs=costs, max_purse=max_purse, total_value_memo=total_value_memo,
+        total_cost_memo=total_cost_memo, item_set_memo=item_set_memo
+    )
+    if suffix_purse_1 >= 0:
+        total_value_1 = suffix_value_1 + values[items[i]]
+        total_item_set_1 = suffix_item_set_1.union({i})
+        total_cost_1 = suffix_cost_1 + costs[items[i]]
+    else:
+        total_value_1 = -inf
+        total_item_set_1 = set()
+        total_cost_1 = inf
+
+    # without current_item
+    suffix_purse_2 = purse
+    suffix_value_2, suffix_cost_2, suffix_item_set_2 = _knapsack_suffix_recurrence(
+        i=i+1, purse=suffix_purse_2, items=items, values=values,
+        costs=costs, max_purse=max_purse, total_value_memo=total_value_memo,
+        total_cost_memo=total_cost_memo, item_set_memo=item_set_memo
+    )
+    total_value_2 = suffix_value_2
+    total_item_set_2 = suffix_item_set_2
+    total_cost_2 = suffix_cost_2
+
+    if total_value_1 > total_value_2:
+        max_total_value=total_value_1
+        optimal_item_set=total_item_set_1
+        optimal_cost=total_cost_1
+    else:
+        max_total_value=total_value_2
+        optimal_item_set=total_item_set_2
+        optimal_cost=total_cost_2
+    assert optimal_cost <= max_purse
+    total_value_memo[(i,purse)] = max_total_value
+    item_set_memo[(i, purse)] = optimal_item_set
+    total_cost_memo[(i,purse)] = optimal_cost
+    return total_value_memo[(i, purse)], total_cost_memo[(i, purse)], item_set_memo[(i, purse)]
+
+def knapsack(values: dict, costs: dict, purse_size: int) -> tuple[set, int, int]:
+    assert len(values) == len(costs)
+    assert set(values.keys()) == set(costs.keys())
+
+    """
+    1.subproblem - suffixes, choose (or ignore) an item, and recursively solve with remaining purse and items
+        - number of subproblems = number of allowed items * purse_size_possibilities = nummber of allowed items ^ 2
+    2.guess - include next item or not
+    3.recurrence - optimal_total_value(item_index, purse) = 
+        min of
+            optimal_total_value(item_index+1:, purse)
+            optimal_total_value(item_index+1:, purse - cost(item_index)) + value(item_index)
+    4.topological order - start from smallest item set and small values of purse
+    5.original problem - optimal_total_value(0, full_purse)
+    """
+    items = list(values.keys())
+    total_value_memo = {}
+    total_cost_memo = {}
+    item_set_memo = {}
+    value,cost,item_set = _knapsack_suffix_recurrence(
+        i=0,purse=purse_size, items=items, values=values, costs=costs, max_purse=purse_size,
+        total_value_memo=total_value_memo, total_cost_memo=total_cost_memo, item_set_memo=item_set_memo
+    )
+    actual_item_set = set()
+    for index in item_set:
+        actual_item_set.add(items[index])
+    return actual_item_set, value, cost

@@ -54,3 +54,11 @@ def test_edit_distances():
         dp.CharOperation(dp.CharOperationType.REPLACE, "ds", 10),
     ]
     assert expected_sequence == transform_sequence
+
+def test_knapsack():
+    values = {"a":3, "b":4, "c":5, "d":6 }
+    costs = {"a":2, "b":3, "c":4, "d":5 }
+    items, value, cost = dp.knapsack(values=values, costs=costs, purse_size=5)
+    assert set({"a", "b"}) == items
+    assert 5 == cost
+    assert 7 == value

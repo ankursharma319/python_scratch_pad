@@ -1,5 +1,7 @@
 from cmath import inf
 import math
+from enum import Enum
+from typing import Iterable
 
 def _badness(line: list[str], page_width: int) -> int:
     """
@@ -136,3 +138,85 @@ def paranthesize_matrix_multiplication(matrix_sizes):
     return _paranths_to_result(
         matrices=matrix_sizes, paranths_memo=paranths_memo, i=0, j=len(matrix_sizes)
     )
+
+class CharOperationType(Enum):
+    INSERT = 1
+    DELETE = 2
+    REPLACE = 3
+
+class CharOperation:
+    def __init__(self, type: CharOperationType, char: str, pos: int) -> None:
+        self.type = type
+        self.char = char
+        self.pos = pos
+
+    def __repr__(self) -> str:
+        res = ""
+        if self.type == CharOperationType.DELETE:
+            res="CharOperationType.DELETE"
+        elif self.type == CharOperationType.INSERT:
+            res="CharOperationType.INSERT"
+        else:
+            res="CharOperationType.REPLACE"
+        res += f", {self.char}, {self.pos}"
+        return res
+    
+    def __eq__(self, __o: object) -> bool:
+        return (self.type == __o.type) and (self.char == __o.char) and (self.pos == __o.pos)
+
+def _cost_operation(op):
+    if isinstance(op, Iterable):
+        raise RuntimeError("Todo")
+    return 1
+
+def _suffix_edit_distance(i: int, j:int, a: str, b: str, seq_memo: dict, cost_memo: dict):
+    if (i,j) in seq_memo:
+        assert (i,j) in cost_memo
+        return seq_memo[(i, j)], cost_memo[(i, j)]
+    if i >= len(a) and j >= len(b):
+        return [], 0
+    if i < len(a) and j < len(b) and a[i] == b[j]:
+        suffix_seq, suffix_cost = _suffix_edit_distance(i=i+1, j=j+1, a=a, b=b, seq_memo=seq_memo, cost_memo=cost_memo)
+        cost_memo[(i,j)] = suffix_cost
+        seq_memo[(i,j)] = suffix_seq 
+        return seq_memo[(i, j)], cost_memo[(i, j)]
+    guesses = []
+    if i < len(a):
+        guesses.append(CharOperation(CharOperationType.DELETE, a[i], i))
+    if j < len(b):
+        guesses.append(CharOperation(CharOperationType.INSERT, b[j], i))
+    if i < len(a) and j < len(b):
+        guesses.append(CharOperation(CharOperationType.REPLACE, a[i] + b[j], i))
+    current_minimum_guess = None
+    current_minimum_cost = inf
+    for guess in guesses:
+        remaining_i = i
+        if guess.type == CharOperationType.INSERT:
+            remaining_i = i
+            remaining_j = j+1
+        elif guess.type == CharOperationType.DELETE:
+            remaining_i = i+1
+            remaining_j = j
+        else:
+            remaining_i = i+1
+            remaining_j = j+1
+        suffix_seq, suffix_cost = _suffix_edit_distance(i=remaining_i, j=remaining_j, a=a, b=b, seq_memo=seq_memo, cost_memo=cost_memo)
+        total_cost = _cost_operation(op=guess) + suffix_cost
+        if current_minimum_cost > total_cost:
+            current_minimum_cost = total_cost
+            current_minimum_guess = [guess] + suffix_seq
+    assert current_minimum_guess is not None
+    assert current_minimum_cost is not inf
+    seq_memo[(i,j)] = current_minimum_guess
+    cost_memo[(i,j)] = current_minimum_cost
+    return seq_memo[(i, j)], cost_memo[(i, j)]
+
+
+def string_edit_distance(a: str, b: str) -> list [CharOperation]:
+    """
+    gives the sequence of operations to do on string a to convert it into b
+    """
+    seq_memo = {}
+    cost_memo = {}
+    seq, _ = _suffix_edit_distance(i=0, j=0, a=a, b=b, seq_memo=seq_memo, cost_memo=cost_memo)
+    return seq

@@ -43,3 +43,14 @@ def test_paranthesization_matrix_multipliciation_complex():
         ]
     ]
     assert expected_result == result
+
+def test_edit_distances():
+    transform_sequence = dp.string_edit_distance(a="hello world", b="shell wars")
+    expected_sequence = [
+        dp.CharOperation(dp.CharOperationType.INSERT, "s", 0),
+        dp.CharOperation(dp.CharOperationType.DELETE, "o", 4),
+        dp.CharOperation(dp.CharOperationType.REPLACE, "oa", 7),
+        dp.CharOperation(dp.CharOperationType.DELETE, "l", 9),
+        dp.CharOperation(dp.CharOperationType.REPLACE, "ds", 10),
+    ]
+    assert expected_sequence == transform_sequence

@@ -50,17 +50,21 @@ def run_day_02():
             total_score += score
     print(total_score)
 
-def _find_common_char(a, b):
-    set_a = set()
-    for c in a:
-        set_a.add(c)
-    answer = None
-    for c in b:
-        if c in set_a:
-            assert (answer is None) or (answer == c)
-            answer = c
-    assert answer is not None
-    return answer
+def _find_common_char(strings):
+    assert len(strings) == 3
+    sets = []
+    for string in strings:
+        set_current = set()
+        for c in string:
+            set_current.add(c)
+        sets.append(set_current)
+    assert len(sets) == 3
+    print(f"strings={strings}")
+    print(f"sets={sets}")
+    intersection_set = set.intersection(*sets)
+    print(f"intersection_set={intersection_set}")
+    assert len(intersection_set) == 1
+    return intersection_set.pop()
 
 def _get_priority(c):
     assert len(c) == 1
@@ -72,17 +76,16 @@ def _get_priority(c):
 
 def run_day_03():
     with open('./input03.txt') as f:
+        i = 0
         total_priority = 0
+        current_lines = []
         for line in f:
-            stripped = line.rstrip()
-            mid_index = len(stripped)//2
-            print(f"mid_index = {mid_index}")
-            compartment_a = stripped[0:mid_index]
-            compartment_b = stripped[mid_index:]
-            assert(len(compartment_a) == len(compartment_b))
-            print(f"compartment_a={compartment_a} , compartment_b={compartment_b}")
-            c = _find_common_char(compartment_a, compartment_b)
-            current_priority = _get_priority(c)
+            if (i % 3 == 0):
+                current_lines = []
+            current_lines.append(line.rstrip())
+            i+=1
+            if len(current_lines) != 3:
+                continue
+            c = _find_common_char(current_lines)
             total_priority+= _get_priority(c)
         print(f"total_priority = {total_priority}")
-run_day_03()

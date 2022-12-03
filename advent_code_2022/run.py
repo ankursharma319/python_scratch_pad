@@ -49,3 +49,40 @@ def run_day_02():
             score += static_scores[me]
             total_score += score
     print(total_score)
+
+def _find_common_char(a, b):
+    set_a = set()
+    for c in a:
+        set_a.add(c)
+    answer = None
+    for c in b:
+        if c in set_a:
+            assert (answer is None) or (answer == c)
+            answer = c
+    assert answer is not None
+    return answer
+
+def _get_priority(c):
+    assert len(c) == 1
+    if ord(c) >= ord('a') and ord(c) <= ord('z'):
+        return ord(c)-ord('a')+1
+    if ord(c) >= ord('A') and ord(c) <= ord('Z'):
+        return ord(c)-ord('A')+27
+    assert False
+
+def run_day_03():
+    with open('./input03.txt') as f:
+        total_priority = 0
+        for line in f:
+            stripped = line.rstrip()
+            mid_index = len(stripped)//2
+            print(f"mid_index = {mid_index}")
+            compartment_a = stripped[0:mid_index]
+            compartment_b = stripped[mid_index:]
+            assert(len(compartment_a) == len(compartment_b))
+            print(f"compartment_a={compartment_a} , compartment_b={compartment_b}")
+            c = _find_common_char(compartment_a, compartment_b)
+            current_priority = _get_priority(c)
+            total_priority+= _get_priority(c)
+        print(f"total_priority = {total_priority}")
+run_day_03()

@@ -89,3 +89,28 @@ def run_day_03():
             c = _find_common_char(current_lines)
             total_priority+= _get_priority(c)
         print(f"total_priority = {total_priority}")
+
+def _fully_contains(left_range, right_range):
+    if (left_range[0] < right_range[0]):
+        return left_range[1] >= right_range[1]
+    if (left_range[0] > right_range[0]):
+        return left_range[1] <= right_range[1]
+    return True
+
+def run_day_04():
+    with open('./input04.txt') as f:
+        fully_contained_count = 0
+        for line in f:
+            sides = line.rstrip().split(",")
+            assert len(sides) == 2
+            left_range = [int(x) for x in sides[0].split("-")]
+            right_range = [int(x) for x in sides[1].split("-")]
+            assert len(left_range) == 2
+            assert len(right_range) == 2
+            fc = _fully_contains(left_range, right_range)
+            print(f"left_range={left_range}, right_range={right_range}, fully_contains={fc}")
+            if fc:
+                fully_contained_count += 1
+        print(f"fully_contained_count = {fully_contained_count}")
+
+run_day_04()

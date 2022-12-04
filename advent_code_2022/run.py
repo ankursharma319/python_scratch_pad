@@ -90,16 +90,26 @@ def run_day_03():
             total_priority+= _get_priority(c)
         print(f"total_priority = {total_priority}")
 
-def _fully_contains(left_range, right_range):
-    if (left_range[0] < right_range[0]):
-        return left_range[1] >= right_range[1]
-    if (left_range[0] > right_range[0]):
-        return left_range[1] <= right_range[1]
+def _fully_contains(range_a, range_b):
+    if (range_a[0] < range_b[0]):
+        return range_a[1] >= range_b[1]
+    if (range_a[0] > range_b[0]):
+        return range_a[1] <= range_b[1]
+    return True
+
+def _any_overlap(range_a, range_b):
+    assert range_a[0] <= range_a[1]
+    assert range_b[0] <= range_b[1]
+    if range_a[0] < range_b[0]:
+        return not range_a[1] < range_b[0]
+    if range_a[0] > range_b[0]:
+        return not range_b[1] < range_a[0]
     return True
 
 def run_day_04():
     with open('./input04.txt') as f:
         fully_contained_count = 0
+        any_overlap_count = 0
         for line in f:
             sides = line.rstrip().split(",")
             assert len(sides) == 2
@@ -108,9 +118,11 @@ def run_day_04():
             assert len(left_range) == 2
             assert len(right_range) == 2
             fc = _fully_contains(left_range, right_range)
-            print(f"left_range={left_range}, right_range={right_range}, fully_contains={fc}")
+            ov = _any_overlap(left_range, right_range)
+            print(f"left_range={left_range}, right_range={right_range}, fully_contains={fc}, overlaps={ov}")
             if fc:
                 fully_contained_count += 1
+            if ov:
+                any_overlap_count += 1
         print(f"fully_contained_count = {fully_contained_count}")
-
-run_day_04()
+        print(f"any_overlap_count = {any_overlap_count}")

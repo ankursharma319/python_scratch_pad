@@ -126,3 +126,62 @@ def run_day_04():
                 any_overlap_count += 1
         print(f"fully_contained_count = {fully_contained_count}")
         print(f"any_overlap_count = {any_overlap_count}")
+
+def run_day_05():
+    stacks = {}
+    with open('./input05.txt') as f:
+        stack_lines = []
+        for line in f:
+            if line == '\n':
+                break
+            stack_lines.append(line.rstrip("\n"))
+        stack_keys = stack_lines.pop().strip().split("  ")
+        print(f"stack_keys = {stack_keys}")
+        for key in stack_keys:
+            stacks[int(key)] = []
+        print(f"stack_lines = {stack_lines}")
+        for line in stack_lines[::-1]:
+            splits = [line[i*4:(i+1)*4] for i in range(len(stacks))]
+            print(f"splits = {splits}")
+            assert len(splits) == len(stack_keys)
+            for i in range(len(splits)):
+                string = splits[i].strip()
+                if not string:
+                    continue
+                assert string.startswith("[")
+                assert string.endswith("]")
+                char = string.lstrip("[").rstrip("]")
+                stacks[int(stack_keys[i])].append(char)
+
+    #print(f"stacks = {stacks}")
+    for stack_key in stacks:
+        print(f"printing stack for stack_key = {stack_key}")
+        print(f"stack = {stacks[stack_key]}")
+
+    with open('./input05.txt') as f:
+        parse_actions = False
+        for line in f:
+            if line == '\n':
+                parse_actions = True
+                continue
+            if not parse_actions:
+                continue
+            assert "move " in line
+            assert " from " in line
+            assert " to " in line
+            first_split = line.rstrip().lstrip("move ").split(" from ")
+            quantity = int(first_split[0])
+            second_split = first_split[1].split(" to ")
+            move_from = int(second_split[0])
+            move_to = int(second_split[1])
+            for i in range(quantity):
+                stacks[move_to].append(stacks[move_from].pop())
+            #print(f"quantity = {quantity}, move_from = {move_from}, move_to = {move_to}")
+    
+    tops = []
+    for i in range(1, len(stacks)+1):
+        tops.append(stacks[i].pop())
+    print(f"top of each stack after running the actions = {tops}")
+            
+
+run_day_05()

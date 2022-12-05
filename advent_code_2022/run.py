@@ -174,14 +174,11 @@ def run_day_05():
             second_split = first_split[1].split(" to ")
             move_from = int(second_split[0])
             move_to = int(second_split[1])
-            for i in range(quantity):
-                stacks[move_to].append(stacks[move_from].pop())
+            stacks[move_to].extend(stacks[move_from][-quantity:])
+            del stacks[move_from][-quantity:]
             #print(f"quantity = {quantity}, move_from = {move_from}, move_to = {move_to}")
     
     tops = []
     for i in range(1, len(stacks)+1):
         tops.append(stacks[i].pop())
-    print(f"top of each stack after running the actions = {tops}")
-            
-
-run_day_05()
+    print(f"top of each stack after running the actions = {''.join(tops)}")

@@ -182,3 +182,34 @@ def run_day_05():
     for i in range(1, len(stacks)+1):
         tops.append(stacks[i].pop())
     print(f"top of each stack after running the actions = {''.join(tops)}")
+
+def _find_start_marker(content: str, n_chars=4):
+    assert len(content) >= n_chars
+    i = n_chars
+    last_n = content[0:n_chars]
+    def is_all_unique(substring):
+        my_set = set()
+        for x in substring:
+            my_set.add(x)
+        return len(my_set) == len(substring)
+
+    if is_all_unique(last_n):
+        return i
+    while i < len(content):
+        print(f"at i={i}, last_n={last_n}")
+        last_n = last_n[1:] + content[i]
+        print(f"checking last_n={last_n}")
+        assert len(last_n) == n_chars
+        i += 1
+        if is_all_unique(last_n):
+            return i
+    return 0
+
+def run_day_06():
+    content = ""
+    with open('./input06.txt') as f:
+        content = f.read()
+    start_marker = _find_start_marker(content)
+    print(f"start_marker = {start_marker}")
+
+run_day_06()

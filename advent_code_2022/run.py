@@ -183,27 +183,14 @@ def run_day_05():
         tops.append(stacks[i].pop())
     print(f"top of each stack after running the actions = {''.join(tops)}")
 
-def _find_start_marker(content: str, n_chars=4):
-    assert len(content) >= n_chars
-    i = n_chars
-    last_n = content[0:n_chars]
-    def is_all_unique(substring):
-        my_set = set()
-        for x in substring:
-            my_set.add(x)
-        return len(my_set) == len(substring)
+def _find_start_marker(content: str, n_chars=14):
+    def is_all_unique(string):
+        return len(set(string)) == len(string)
 
-    if is_all_unique(last_n):
-        return i
-    while i < len(content):
-        print(f"at i={i}, last_n={last_n}")
-        last_n = last_n[1:] + content[i]
-        print(f"checking last_n={last_n}")
-        assert len(last_n) == n_chars
-        i += 1
-        if is_all_unique(last_n):
-            return i
-    return 0
+    for i in range(len(content)-n_chars):
+        if is_all_unique(content[i:i+n_chars]):
+            return i+n_chars
+    raise RuntimeError("Shouldnt reach here")
 
 def run_day_06():
     content = ""
@@ -211,5 +198,3 @@ def run_day_06():
         content = f.read()
     start_marker = _find_start_marker(content)
     print(f"start_marker = {start_marker}")
-
-run_day_06()

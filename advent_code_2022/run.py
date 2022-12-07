@@ -208,14 +208,6 @@ class FsNode:
         self.accum_size = size
         self.children = []
 
-class Node:
-    def __init__(self) -> None:
-        self.children = []
-
-class Node:
-    def __init__(self, children=[]) -> None:
-        self.children = children
-
 def has_file_by_name(node: FsNode, name: str):
     matches = [x for x in node.children if (not x.is_dir) and (x.name == name)]
     assert len(matches) <= 1
@@ -308,6 +300,14 @@ def run_day_07():
     print(f"dirs_list_sizes = {dirs_list_sizes}")
 
     answer_1 = sum(dirs_list_sizes)
-    print(f"answer part 1 = {answer_1}")
+    print(f"answer_1 = {answer_1}")
 
-run_day_07()
+    space_to_be_reclaimed = root_node.accum_size - 40000000
+    dirs_list_sizes_all = [x.accum_size for x in dirs_list]
+    dirs_list_sizes_all = sorted(dirs_list_sizes_all)
+    print(f"space_to_be_reclaimed = {space_to_be_reclaimed}")
+    print(f"dirs_list_sizes_all = {dirs_list_sizes_all}")
+    for x in dirs_list_sizes_all:
+        if x > space_to_be_reclaimed:
+            print(f"answer_2 = {x}")
+            break

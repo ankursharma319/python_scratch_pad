@@ -198,3 +198,116 @@ def run_day_06():
         content = f.read()
     start_marker = _find_start_marker(content)
     print(f"start_marker = {start_marker}")
+
+class FsNode:
+    def __init__(self, is_dir, name, parent=None, size=0) -> None:
+        self.is_dir = is_dir
+        self.name = name
+        self.parent = parent
+        self.size = size
+        self.accum_size = size
+        self.children = []
+
+class Node:
+    def __init__(self) -> None:
+        self.children = []
+
+class Node:
+    def __init__(self, children=[]) -> None:
+        self.children = children
+
+def has_file_by_name(node: FsNode, name: str):
+    matches = [x for x in node.children if (not x.is_dir) and (x.name == name)]
+    assert len(matches) <= 1
+    return len(matches) > 0
+
+def has_dir_by_name(node: FsNode, name: str):
+    matches = [x for x in node.children if x.is_dir and (x.name == name)]
+    assert len(matches) <= 1
+    return len(matches) > 0
+
+def print_tree(root: FsNode, prefix=""):
+    print(f"{prefix}{'d' if root.is_dir else 'f'} - {root.name}")
+    for child in root.children:
+        #print(f"child = {child.name}")
+        print_tree(child, prefix=f"     {prefix}")
+
+def get_accum_size(node):
+    size = 0
+    for child in node.children:
+        size += child.size
+    pass
+
+def populate_accum_size(root_node):
+    for child in root_node.children:
+        root_node.accum_size += child.size
+        if child.is_dir:
+            populate_accum_size(child)
+            root_node.accum_size += child.accum_size
+
+def get_dirs_list(root_node):
+    dirs = [root_node]
+    for child in root_node.children:
+        if child.is_dir:
+            dirs += get_dirs_list(child)
+    return dirs
+
+def run_day_07():
+    root_node = FsNode(is_dir=True, name="/")
+    current_node = None
+    with open('./input07.txt') as f:
+        for line in f:
+            line = line.rstrip()
+            #print(f"line={line}")
+            if line.startswith("$"):
+                line = line[1:].lstrip()
+                if line.startswith("cd"):
+                    #print("cd command")
+                    splits = line.split(" ")
+                    assert len(splits) == 2
+                    assert splits[0] == "cd"
+                    cd_dir = splits[1]
+                    if cd_dir == "/":
+                        current_node = root_node
+                    elif cd_dir == "..":
+                        current_node = current_node.parent
+                        assert current_node
+                    else:
+                        matches = [x for x in current_node.children if (x.is_dir and (x.name == cd_dir))]
+                        assert len(matches) == 1, f"{len(matches)}==1"
+                        current_node = matches[0]
+                    #print(f"now the current node is {current_node.name}")
+                else:
+                    assert line == "ls"
+                    #print("ls command")
+                continue
+            if not line.startswith("dir"):
+                splits = line.split(" ")
+                assert len(splits) == 2
+                size = int(splits[0])
+                file_name = splits[1]
+                assert not has_file_by_name(current_node, file_name)
+                #print(f"adding file by name {file_name} to {current_node.name}")
+                current_node.children.append(FsNode(is_dir=False, name=file_name, parent=current_node, size=size))
+            else:
+                splits = line.split(" ")
+                assert len(splits) == 2
+                assert splits[0] == "dir"
+                dir_name = splits[1]
+                assert not has_dir_by_name(current_node, dir_name)
+                #print(f"adding dir by name {dir_name} to {current_node.name}")
+                current_node.children.append(FsNode(is_dir=True, name=dir_name, parent=current_node))
+
+    populate_accum_size(root_node)
+    print("printing parsed tree")
+    print_tree(root_node)
+    dirs_list = get_dirs_list(root_node=root_node)
+    for dir_node in dirs_list:
+        print(f"dir by name {dir_node.name} has accum_size {dir_node.accum_size}")
+    dirs_list_sizes = [x.accum_size for x in dirs_list if x.accum_size < 100000]
+    print(f"dirs_list_sizes = {dirs_list_sizes}")
+
+    answer_1 = sum(dirs_list_sizes)
+    print(f"answer part 1 = {answer_1}")
+
+run_day_07()

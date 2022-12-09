@@ -316,4 +316,31 @@ def run_day_08():
     print(f"visibility_arr after updating from top = \n{visibility_arr}")
     print(f"visible trees count = {np.sum(visibility_arr)}")
 
-run_day_08()
+    max_visibility_score = 0
+    for r in range(1, arr.shape[0]-1):
+        for c in range(1, arr.shape[1]-1):
+            current_tree = arr[r,c]
+            left_visibility = 0
+            for i in range(c-1, -1, -1):
+                left_visibility += 1
+                if current_tree <= arr[r,i]:
+                    break
+            right_visibility = 0
+            for i in range(c+1, arr.shape[1]):
+                right_visibility += 1
+                if current_tree <= arr[r,i]:
+                    break
+            bottom_visibility = 0
+            for i in range(r+1, arr.shape[0]):
+                bottom_visibility += 1
+                if current_tree <= arr[i,c]:
+                    break
+            top_visibility = 0
+            for i in range(r-1, -1,-1):
+                top_visibility += 1
+                if current_tree <= arr[i,c]:
+                    break
+            visibility_score = left_visibility * right_visibility * bottom_visibility * top_visibility
+            max_visibility_score = max(max_visibility_score, visibility_score)
+    print(f"max_visibility_score = {max_visibility_score}")
+

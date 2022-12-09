@@ -260,3 +260,60 @@ def run_day_07():
         if x > root_node.accum_size - 40000000:
             print(f"answer_2 = {x}")
             break
+
+import numpy as np
+
+def run_day_08():
+    arr = []
+    with open('./input08.txt') as f:
+        for line in f:
+            row = []
+            for i in range(len(line.rstrip())):
+                row.append(int(line[i]))
+            arr.append(row)
+    arr = np.array(arr, dtype=np.int32)
+    visibility_arr = np.zeros(arr.shape, dtype=np.int32)
+    print(f"arr.shape = {arr.shape}")
+    print(f"visibility_arr.shape = {visibility_arr.shape}")
+
+    # update visibility from left
+    for r in range(arr.shape[0]):
+        current_max = -1
+        for c in range(arr.shape[1]):
+            if arr[r, c] > current_max:
+                visibility_arr[r, c] = 1
+            current_max = max(current_max, arr[r,c])
+
+    print(f"visibility_arr after updating from left = \n{visibility_arr}")
+
+    # update visibility from right
+    for r in range(arr.shape[0]):
+        current_max = -1
+        for c in range(arr.shape[1]-1, -1, -1):
+            if arr[r, c] > current_max:
+                visibility_arr[r, c] = 1
+            current_max = max(current_max, arr[r,c])
+
+    print(f"visibility_arr after updating from right = \n{visibility_arr}")
+
+    # update visibility from bottom
+    for c in range(arr.shape[1]):
+        current_max = -1
+        for r in range(arr.shape[0]-1, -1, -1):
+            if arr[r, c] > current_max:
+                visibility_arr[r, c] = 1
+            current_max = max(current_max, arr[r,c])
+    print(f"visibility_arr after updating from bottom = \n{visibility_arr}")
+
+    # update visibility from top
+    for c in range(arr.shape[1]):
+        current_max = -1
+        for r in range(arr.shape[0]):
+            if arr[r, c] > current_max:
+                visibility_arr[r, c] = 1
+            current_max = max(current_max, arr[r,c])
+    
+    print(f"visibility_arr after updating from top = \n{visibility_arr}")
+    print(f"visible trees count = {np.sum(visibility_arr)}")
+
+run_day_08()

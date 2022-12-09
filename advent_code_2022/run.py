@@ -344,3 +344,72 @@ def run_day_08():
             max_visibility_score = max(max_visibility_score, visibility_score)
     print(f"max_visibility_score = {max_visibility_score}")
 
+def _get_updated_tail_coords(x_head, y_head, x_tail, y_tail):
+    if abs(x_head - x_tail) > 1:
+        assert abs(x_head - x_tail) == 2
+        if (abs(y_head - y_tail) == 1):
+            # move diagonally
+            if y_head > y_tail:
+                y_tail += 1
+            else:
+                y_tail -= 1
+            if x_head > x_tail:
+                x_tail += 1
+            else:
+                x_tail -= 1
+        else:
+            assert (y_head == y_tail)
+            # move horizontally
+            if x_head > x_tail:
+                x_tail += 1
+            else:
+                x_tail -= 1
+    if abs(y_head - y_tail) > 1:
+        if (abs(x_head - x_tail) == 1):
+            # move diagonally
+            if y_head > y_tail:
+                y_tail += 1
+            else:
+                y_tail -= 1
+            if x_head > x_tail:
+                x_tail += 1
+            else:
+                x_tail -= 1
+        else:
+            assert (x_head == x_tail)
+            #move vertically
+            if y_head > y_tail:
+                y_tail += 1
+            else:
+                y_tail -= 1
+    assert abs(x_tail - x_head) <= 1
+    assert abs(y_tail - y_head) <= 1
+    return (x_tail, y_tail)
+
+def run_day_09():
+    with open('./input09.txt') as f:
+        vertices_visited = set()
+        x_tail = 0
+        y_tail = 0
+        x_head = 0
+        y_head = 0
+        for line in f:
+            splits = line.rstrip().split(" ")
+            assert len(splits) == 2
+            dir = splits[0]
+            num = int(splits[1])
+            for i in range(num):
+                if dir == "U":
+                    y_head += 1
+                elif dir == "D":
+                    y_head -= 1
+                elif dir == "R":
+                    x_head += 1
+                else:
+                    assert dir == "L"
+                    x_head -= 1
+                x_tail, y_tail =_get_updated_tail_coords(x_head=x_head, y_head=y_head, x_tail=x_tail, y_tail=y_tail)
+                vertices_visited.add((x_tail, y_tail))
+        print(f"number of vertices visited = {len(vertices_visited)}")
+
+run_day_09()

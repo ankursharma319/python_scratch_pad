@@ -410,3 +410,33 @@ def run_day_09():
                     coords[i] = _get_updated_tail_coords(x_head=coords[i-1][0], y_head=coords[i-1][1], x_tail=coords[i][0], y_tail=coords[i][1])
                 vertices_visited.add(coords[-1])
         print(f"number of vertices visited = {len(vertices_visited)}")
+
+def run_day_10():
+    with open('./input10.txt') as f:
+        cycle_number = 1
+        x_value = 1
+        interesting_cycles = [20, 60, 100, 140, 180, 220]
+        x_at_interesting_points = {}
+        for i, line in enumerate(f):
+            #print(f"i={i}, line={line.rstrip()}")
+            if cycle_number in interesting_cycles:
+                x_at_interesting_points[cycle_number] = x_value
+            if line.rstrip() == "noop":
+                cycle_number += 1
+            else:
+                splits = line.rstrip().split(" ")
+                assert len(splits) == 2
+                assert splits[0] == "addx"
+                addx = int(splits[1])
+                if (cycle_number + 1) in interesting_cycles:
+                    x_at_interesting_points[cycle_number+1] = x_value
+                x_value += addx
+                cycle_number += 2
+
+    print(f"x_at_interesting_points = {x_at_interesting_points}")
+    signal_strengths = [x*x_at_interesting_points[x] for x in interesting_cycles]
+    print(f"signal_strengths = {signal_strengths}")
+    print(f"total_signal_strength = {sum(signal_strengths)}")
+
+run_day_10()
+

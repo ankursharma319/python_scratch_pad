@@ -415,12 +415,18 @@ def run_day_10():
     with open('./input10.txt') as f:
         cycle_number = 1
         x_value = 1
-        interesting_cycles = [20, 60, 100, 140, 180, 220]
-        x_at_interesting_points = {}
+        interesting_cycles = [41, 81, 121, 161, 201]
+        crt = ""
         for i, line in enumerate(f):
             #print(f"i={i}, line={line.rstrip()}")
             if cycle_number in interesting_cycles:
-                x_at_interesting_points[cycle_number] = x_value
+                crt = crt + "\n"
+            horizontal_pos = (cycle_number-1) % 40
+            if abs(horizontal_pos - x_value) <= 1:
+                crt = crt + "#"
+            else:
+                crt = crt + "."
+
             if line.rstrip() == "noop":
                 cycle_number += 1
             else:
@@ -429,14 +435,13 @@ def run_day_10():
                 assert splits[0] == "addx"
                 addx = int(splits[1])
                 if (cycle_number + 1) in interesting_cycles:
-                    x_at_interesting_points[cycle_number+1] = x_value
+                    crt = crt + "\n"
+                horizontal_pos = (cycle_number) % 40
+                if abs(horizontal_pos - x_value) <= 1:
+                    crt = crt + "#"
+                else:
+                    crt = crt + "."
                 x_value += addx
                 cycle_number += 2
 
-    print(f"x_at_interesting_points = {x_at_interesting_points}")
-    signal_strengths = [x*x_at_interesting_points[x] for x in interesting_cycles]
-    print(f"signal_strengths = {signal_strengths}")
-    print(f"total_signal_strength = {sum(signal_strengths)}")
-
-run_day_10()
-
+        print(f"crt =\n{crt}")

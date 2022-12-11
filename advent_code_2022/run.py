@@ -445,3 +445,102 @@ def run_day_10():
                 cycle_number += 2
 
         print(f"crt =\n{crt}")
+
+class Monkey:
+    def __init__(self, items, operation, test) -> None:
+        self.items = items
+        self.operation = operation
+        self.test = test
+        self.total_items_inspected = 0
+    
+    def __repr__(self) -> str:
+        return f"Monkey with items: {str(self.items)}"
+
+def _parse_operation(line):
+    assert line.startswith("  Operation: new = ")
+    op_splits = line.split("  Operation: new = ")
+    assert len(op_splits) == 2
+    line = op_splits[1]
+    op = lambda x: x
+    if "+" in line:
+        op_splits = line.split("+")
+        assert len(op_splits) == 2
+        op_splits = sorted(op_splits)
+        assert op_splits[1].strip() == 'old'
+        if op_splits[0].strip() == 'old':
+            op = lambda x: x + x
+        else:
+            const = int(op_splits[0].strip())
+            op = lambda x: x + const
+    else:
+        assert "*" in line
+        op_splits = line.split("*")
+        assert len(op_splits) == 2
+        op_splits = sorted(op_splits)
+        assert op_splits[1].strip() == 'old'
+        if op_splits[0].strip() == 'old':
+            op = lambda x: x * x
+        else:
+            const = int(op_splits[0].strip())
+            op = lambda x: x * const
+    return op
+
+def _parse_test(lines):
+    assert len(lines) == 3
+    assert lines[0].startswith("  Test: divisible by ")
+    divisible_by = int(lines[0].split("divisible by ")[1])
+    assert lines[1].startswith("    If true: throw to monkey ")
+    assert lines[2].startswith("    If false: throw to monkey ")
+    success_monkey = int(lines[1].split("to monkey ")[1])
+    fail_monkey = int(lines[2].split("to monkey ")[1])
+    op = lambda x: success_monkey if (x%divisible_by == 0) else fail_monkey
+    return op
+
+def _process_monkey(monkeys: dict, id: int):
+    monkey : Monkey = monkeys[id]
+    for x in monkey.items:
+        new_worry_lvl = monkey.operation(x)
+        new_worry_lvl = new_worry_lvl//3
+        to_monkey = monkey.test(new_worry_lvl)
+        assert to_monkey != id
+        monkeys[to_monkey].items.append(new_worry_lvl)
+    monkey.total_items_inspected += len(monkey.items)
+    monkey.items = []
+
+def _run_monkey_rounds(monkeys: dict, rounds: int):
+    current_round = 0
+    while (current_round < rounds):
+        current_monkey_id = 0
+        while current_monkey_id < len(monkeys):
+            _process_monkey(monkeys=monkeys, id=current_monkey_id)
+            current_monkey_id += 1
+        current_round += 1
+
+def run_day_11():
+    content = None
+    with open('./input11.txt') as f:
+        content = f.read()
+    splits = content.split("\n\n")
+    monkeys = {}
+    for split in splits:
+        lines = split.split("\n")
+        assert len(lines) == 6
+        assert lines[0].startswith("Monkey ")
+        id = int(lines[0].rstrip(":").split(" ")[1])
+        assert lines[1].startswith("  Starting items: "), f"{lines[1]}"
+        items = lines[1].split(":")[1].strip().split(",")
+        items = list(map(int, items))
+        op = _parse_operation(line=lines[2])
+        test = _parse_test(lines=lines[3:6])
+        monkeys[id] = Monkey(items=items, operation=op, test=test)
+
+    assert set(monkeys.keys()) == set(range(len(monkeys)))
+    print(f"monkeys initially = {monkeys}")
+    _run_monkey_rounds(monkeys=monkeys, rounds=20)
+    print(f"monkeys after running rounds = {monkeys}")
+    monkey_activities = [x.total_items_inspected for (_, x) in monkeys.items()]
+    print(f"monky_activities = {monkey_activities}")
+    monkey_activities = sorted(monkey_activities, reverse=True)[0:2]
+    print(f"Final answer = {monkey_activities[0] * monkey_activities[1]}")
+
+run_day_11()

@@ -8,7 +8,7 @@ def bfs(adj_list: dict, starting_vertex, end_vertex):
     levels = {starting_vertex: 0}
     frontier = [starting_vertex]
     level = 0
-    answer = 0
+    answer = math.inf
     print(f"starting bfs from start {starting_vertex} to end {end_vertex}")
     while frontier:
         next = []
@@ -24,8 +24,7 @@ def bfs(adj_list: dict, starting_vertex, end_vertex):
         frontier = next
         level += 1
     return answer, parents
-                
-
+ 
 def _char_height(c):
     if c == 'S':
         return ord('a')
@@ -81,29 +80,30 @@ def _create_adj_list(grid):
 
 def run():
     grid = []
+    starting_vertices = []
     with open("./input12.txt") as f:
-        for line in f:
+        for i,line in enumerate(f):
             arr = []
-            for char in line.rstrip():
+            for j,char in enumerate(line.rstrip()):
                 arr.append(char)
+                if (char == 'a') or (char == 'S'):
+                    starting_vertices.append((i, j))
             grid.append(arr)
-    
+
     print(f"grid =")
     pp.pprint(grid)
     adj_list, start_vertex, end_vertex = _create_adj_list(grid=grid)
     print(f"adj_list =\n")
     pp.pprint(adj_list)
-    print(f"start_vertex = {start_vertex}")
+    #print(f"start_vertex = {start_vertex}")
     print(f"end_vertex = {end_vertex}")
 
-    shortest_path_length, parents = bfs(adj_list=adj_list, starting_vertex=start_vertex, end_vertex=end_vertex)
-    print(f"shortest_path_length = {shortest_path_length}")
+    final_shortest_path_length = math.inf
+    for source in starting_vertices:
+        shortest_path_length, parents = bfs(adj_list=adj_list, starting_vertex=source, end_vertex=end_vertex)
+        final_shortest_path_length = min(final_shortest_path_length, shortest_path_length)
+        print(f"shortest_path_length = {shortest_path_length}")
+    print(f"final shortest_path_length = {final_shortest_path_length}")
 
-    #p = end_vertex
-    #while p != start_vertex:
-    #    print(f"parent of {p} = {parents[p]}")
-    #    p = parents[p]
-
- 
 if __name__ == '__main__':
     run()

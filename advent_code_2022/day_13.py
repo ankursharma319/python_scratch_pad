@@ -1,20 +1,5 @@
 import json
-
-"""
-If both values are integers, the lower integer should come first.
-If the left integer is lower than the right integer, the inputs are in the right order.
-If the left integer is higher than the right integer, the inputs are not in the right order.
-Otherwise, the inputs are the same integer; continue checking the next part of the input.
-
-If both values are lists, compare the first value of each list, then the second value, and so on.
-If the left list runs out of items first, the inputs are in the right order. If the right list runs
-out of items first, the inputs are not in the right order. If the lists are the same length and no
-comparison makes a decision about the order, continue checking the next part of the input.
-
-If exactly one value is an integer, convert the integer to a list which contains that integer as its
-only value, then retry the comparison. For example, if comparing [0,0,0] and 2, convert the right
-value to [2] (a list containing 2); the result is then found by instead comparing [0,0,0] and [2].
-"""
+from functools import cmp_to_key
 
 def _comp_pairs(left, right):
     if isinstance(left, int) and isinstance(right, int):
@@ -49,6 +34,15 @@ def compare_pairs(left, right):
         return True
     return ret
 
+def sort_compare_func(left, right):
+    ret = _comp_pairs(left=left, right=right)
+    if ret is None:
+        return 0
+    if ret:
+        return -1
+    else:
+        return 1
+
 def run():
     packets = []
     with open("./input13.txt") as f:
@@ -56,7 +50,6 @@ def run():
             if line.rstrip() == '':
                 continue
             json_parsed = json.loads(line)
-            print(f"json_parsed =  {json_parsed}")
             packets.append(json_parsed)
 
     assert len(packets) % 2 == 0
@@ -66,6 +59,16 @@ def run():
         if in_order:
             sum_of_indices += (i//2) + 1
     print(f"sum_of_indices = {sum_of_indices}")
+
+    packets.append([[2]])
+    packets.append([[6]])
+    packets = sorted(packets, key=cmp_to_key(sort_compare_func))
+    indice_1 = packets.index([[2]])
+    indice_2 = packets.index([[6]])
+    print(f"indice_1 = {indice_1}")
+    print(f"indice_2 = {indice_2}")
+    decoder_key = (indice_1 + 1) * (indice_2 + 1)
+    print(f"decoder_key = {decoder_key}")
 
 if __name__ == '__main__':
     run()

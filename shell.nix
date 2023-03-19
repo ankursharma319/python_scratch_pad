@@ -12,8 +12,6 @@ in
 pkgs.mkShell {
   buildInputs = [
     python-with-my-packages
-    pkgs.git
-    pkgs.which
     # other dependencies
   ];
   shellHook = ''

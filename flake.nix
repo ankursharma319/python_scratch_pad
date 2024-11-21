@@ -27,6 +27,8 @@
               pandas
               requests
               pytest
+              pillow
+              numpy
               # other python packages you want
           ]);
         in
